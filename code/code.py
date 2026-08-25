@@ -28,28 +28,23 @@ cacti_text_lst = [cactus_text,cactus_text2,cactus_text3,cactus_text4]
 cacti_list = []
 cactus_timer = 0
 cactus_interval = 3
+
+
 while True:
-    cactus_timer+=0.5
-    if cactus_timer >= cactus_interval:
-        cactus_timer = 0
-        cacti_list.append(Vector2(1280,line_pos))
-
-    for cactus_pos in cacti_list:
-        cactus_pos.x -= 8
-
     velocity += gravity
+    cactus_timer += 0.02
+    if cactus_timer > cactus_interval:
+        cactus_timer = 0
+        cacti_list.append(Vector2(1000 + random.randint(-100,100),590))
+    for obstacle_pos in cacti_list:
+        obstacle_pos.x -= 9
     begin_drawing()
     update_music_stream(music)
     clear_background(RAYWHITE)
     draw_line_ex(Vector2(0,line_pos+80),Vector2(1280,line_pos + 80),10.5,BROWN)
-
-    draw_texture_ex(dino_text,dino_pos,dino_rotation,0.1,PURPLE)
     for cactus_pos in cacti_list:
-        draw_texture_ex(random.choice(cacti_text_lst),cactus_pos , 0, 3, CACTUS_COLOR)
-
-
-
-
+        draw_texture_ex(cactus_text,cactus_pos,0,3,CACTUS_COLOR)
+    draw_texture_ex(dino_text,dino_pos,dino_rotation,0.1,PURPLE)
     draw_text_ex(custom_font,f"SCORE : {int(get_time())}",Vector2(540,10),40,3,RED)
 
     dino_pos.y+=velocity
@@ -69,12 +64,14 @@ while True:
         dino_pos.x += 10
     if is_key_down(rl.KEY_A):
         dino_pos.x -= 10
+    for cactus_pos in cacti_list:
 
-
-    if check_collision_recs(Rectangle(dino_pos.x,dino_pos.y,dino_text.width*0.1,dino_text.height*0.1),Rectangle(cactus_pos.x,cactus_pos.y,cactus_text.width * 3,cactus_text.height * 3)):
-        CACTUS_COLOR = RED
-    else:
-        CACTUS_COLOR = GREEN
+        dino_rect = Rectangle(dino_pos.x,dino_pos.y,dino_text.width*0.1,dino_text.height*0.1)
+        cactus_rect = Rectangle(cactus_pos.x,cactus_pos.y,cactus_text.width * 3,cactus_text.height * 3)
+        if check_collision_recs(dino_rect,cactus_rect):
+            CACTUS_COLOR = RED
+        else:
+            CACTUS_COLOR = GREEN
     end_drawing()
     if is_key_pressed(rl.KEY_ESCAPE):
         break
