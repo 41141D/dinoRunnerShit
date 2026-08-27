@@ -6,16 +6,32 @@ class Sprites:
         self.texture = texture
         self.pos = pos
 
+    def get_colission_circle(self):
+        center_x = self.pos.x + (self.texture.width * 4.99) / 2
+        center_y = self.pos.y + (self.texture.height * 4.99) / 2
+        radius = (self.texture.width * 4.99) / 2
+
+        return (center_x, center_y, radius)
+
     def draw(self):
-        draw_texture_ex(self.texture, self.pos,0,4.99,GRAY)
+        draw_texture_ex(self.texture, self.pos, 0, 4.99, WHITE)
 
 
 class MovingSprites(Sprites):
-    def __init__(self, texture, pos,speed):
-        super().__init__(texture, pos)
+    def __init__(self, frames, pos, speed):
+        self.frames = frames if isinstance(frames, list) else [frames]
+        super().__init__(self.frames[0], pos)
+
         self.speed = speed
-    def update(self,dt):
-        self.pos.x -= self.speed*dt
+        self.frame_index = 0
+
+    def update(self, dt):
+        self.pos.x -= self.speed * dt
+
+        if len(self.frames) > 1:
+            self.frame_index += dt * 15
+            self.frame_index %= len(self.frames)
+            self.texture = self.frames[int(self.frame_index)]
 
 
 
@@ -51,3 +67,8 @@ class Dino(Sprites):
 
         self.texture = self.textures[int(self.frame_index)] if self.pos.y > 430 else self.jump
         super().draw()
+class Score:
+    def __init__(self, font):
+        self.font = font
+    def draw(self):
+        draw_text_ex(self.font,f"SCORE : {get_time():.0f}",Vector2(520,50),40,2,DARKGRAY)
